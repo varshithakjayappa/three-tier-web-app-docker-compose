@@ -14,8 +14,10 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-// Creds hard-coded for Demo only!
-const mongoURL = "mongodb://root:password@mongo:27017";
+const username = process.env.MONGO_DB_USERNAME;
+const password = process.env.MONGO_DB_PWD;
+const mongoURL = `mongodb://${username}:${password}@mongo-app:27017`;
+
 const mongoClientOptions = { useNewUrlParser: true, useUnifiedTopology: true };
 const dbName = "contacts-db";
 

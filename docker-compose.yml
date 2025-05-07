@@ -1,0 +1,58 @@
+services:
+  mongo:
+    image: mongo
+    container_name: mongo-app
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    networks:
+     - app-networks
+    volumes:
+      - mongo-data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express-app
+    ports:
+      - "8081:8081"
+    restart: always  
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://root:password@mongo-app:27017/
+    networks:
+      - app-networks
+
+  app-server:
+    build:
+       context: ./app-server/src/
+       dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - app-networks
+    depends_on:
+      - mongo
+      - mongo-express
+
+  web-server:
+    build:
+       context: ./web-server/
+       dockerfile: Dockerfile
+    ports:
+      - "80:30"
+    networks:
+      - app-networks
+    depends_on:
+      - app-server
+
+volumes:
+  mongo-data:
+    driver: local
+
+networks:
+  app-networks:
+    name: app-network
+    driver: bridge
